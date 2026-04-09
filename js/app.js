@@ -2,9 +2,8 @@
 // 🔐 CONFIG
 // ======================
 const supabaseUrl = "https://xcuqimawoztbjwmipqmz.supabase.co";
-const supabaseKey = "YOUR_KEY";
+const supabaseKey = "YOUR_KEY_HERE";
 
-// 🔥 เปลี่ยนชื่อกันชนซ้ำ
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 
@@ -13,25 +12,19 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // ======================
 async function register(){
 
-  const username = document.getElementById("username")?.value.trim();
-  const password = document.getElementById("password")?.value;
-  const confirm = document.getElementById("confirm")?.value;
-  const firstname = document.getElementById("firstname")?.value;
-  const lastname = document.getElementById("lastname")?.value;
-  const phone = document.getElementById("phone")?.value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+  const firstname = document.getElementById("firstname").value;
+  const lastname = document.getElementById("lastname").value;
+  const phone = document.getElementById("phone").value;
   const msg = document.getElementById("msg");
-
-  if(!username || !password){
-    msg.innerHTML = "❌ กรุณากรอกข้อมูล";
-    return;
-  }
 
   if(password !== confirm){
     msg.innerHTML = "❌ รหัสผ่านไม่ตรงกัน";
     return;
   }
 
-  // 🔍 เช็ค username ซ้ำ
   const { data: exist } = await supabaseClient
     .from("users")
     .select("username")
@@ -39,7 +32,7 @@ async function register(){
     .maybeSingle();
 
   if(exist){
-    msg.innerHTML = "❌ Username นี้ถูกใช้แล้ว";
+    msg.innerHTML = "❌ Username ซ้ำ";
     return;
   }
 
@@ -55,7 +48,6 @@ async function register(){
     return;
   }
 
-  // 💾 บันทึก user
   await supabaseClient.from("users").insert([{
     id: data.user.id,
     username,
@@ -73,13 +65,8 @@ async function register(){
 // ======================
 async function login(){
 
-  const username = document.getElementById("username")?.value;
-  const password = document.getElementById("password")?.value;
-
-  if(!username || !password){
-    alert("กรุณากรอกข้อมูล");
-    return;
-  }
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
   const fakeEmail = username + "@ts.com";
 
@@ -124,17 +111,14 @@ async function loadProfile(user){
     .eq("id", user.id)
     .single();
 
-  const el = document.getElementById("usernameShow");
-  if(el){
-    el.innerText = data.username;
+  if(document.getElementById("usernameShow")){
+    document.getElementById("usernameShow").innerText = data.username;
   }
-
-  return data;
 }
 
 
 // ======================
-// ⏰ GENERATE TIME
+// ⏰ TIME
 // ======================
 function generateTime(){
 
@@ -148,39 +132,29 @@ function generateTime(){
     }
   }
 
-  const checkInEl = document.getElementById("check_in");
-  const checkOutEl = document.getElementById("check_out");
-
-  if(checkInEl && checkOutEl){
-    checkInEl.innerHTML = html;
-    checkOutEl.innerHTML = html;
-  }
+  document.getElementById("check_in").innerHTML = html;
+  document.getElementById("check_out").innerHTML = html;
 }
 
 
 // ======================
-// 💾 SAVE ATTENDANCE
+// 💾 SAVE
 // ======================
 async function saveAttendance(user){
 
-  const date = document.getElementById("date_picker")?.value;
-  const cin = document.getElementById("check_in")?.value;
-  const cout = document.getElementById("check_out")?.value;
-  const note = document.getElementById("remarks")?.value;
+  const date = document.getElementById("date_picker").value;
+  const cin = document.getElementById("check_in").value;
+  const cout = document.getElementById("check_out").value;
+  const note = document.getElementById("remarks").value;
 
   let status = document.querySelector(".leave-btn.active")?.innerText || "ปกติ";
 
-  if(!date){
-    alert("กรุณาเลือกวันที่");
-    return;
-  }
-
   await supabaseClient.from("attendance").insert([{
     user_id: user.id,
-    date: date,
+    date,
     check_in: cin,
     check_out: cout,
-    status: status,
+    status,
     remarks: note
   }]);
 
@@ -189,48 +163,35 @@ async function saveAttendance(user){
 
 
 // ======================
-// 📋 LOAD ATTENDANCE
+// 📋 LOAD
 // ======================
 async function loadAttendance(user){
 
   const { data } = await supabaseClient
     .from("attendance")
-    .select(`
-      *,
-      users (username, firstname, lastname)
-    `)
+    .select(`*, users (username)`)
     .order("date", { ascending: false });
 
   const table = document.getElementById("tableBody");
-  if(!table) return;
-
   table.innerHTML = "";
 
   data.forEach(row => {
 
     const isOwner = row.user_id === user.id;
 
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>
-        <a href="statistics.html?user_id=${row.user_id}">
-          ${row.users?.username || "-"}
-        </a>
-      </td>
-      <td>${row.date}</td>
-      <td>${row.check_in || "-"}</td>
-      <td>${row.check_out || "-"}</td>
-      <td>${row.status}</td>
-      <td>${row.remarks || "-"}</td>
-      <td>
-        ${isOwner 
-          ? `<button onclick="deleteRow(${row.id})">ลบ</button>` 
-          : `-`}
-      </td>
+    table.innerHTML += `
+      <tr>
+        <td>${row.users?.username}</td>
+        <td>${row.date}</td>
+        <td>${row.check_in||"-"}</td>
+        <td>${row.check_out||"-"}</td>
+        <td>${row.status}</td>
+        <td>${row.remarks||"-"}</td>
+        <td>
+          ${isOwner ? `<button onclick="deleteRow(${row.id})">ลบ</button>`:"-"}
+        </td>
+      </tr>
     `;
-
-    table.appendChild(tr);
   });
 }
 
@@ -240,74 +201,12 @@ async function loadAttendance(user){
 // ======================
 async function deleteRow(id){
 
-  if(!confirm("ลบข้อมูลนี้ใช่ไหม?")) return;
-
   await supabaseClient
     .from("attendance")
     .delete()
     .eq("id", id);
 
   location.reload();
-}
-
-
-// ======================
-// 📊 STATISTICS
-// ======================
-async function loadStats(){
-
-  const params = new URLSearchParams(window.location.search);
-  const user_id = params.get("user_id");
-
-  const { data } = await supabaseClient
-    .from("attendance")
-    .select("*")
-    .eq("user_id", user_id);
-
-  let work=0, late=0, leave=0, absent=0, total=0;
-
-  const table = document.getElementById("historyTable");
-  if(table) table.innerHTML = "";
-
-  data.forEach(d=>{
-
-    if(d.status==="ปกติ") work++;
-    if(d.status==="สาย") late++;
-    if(d.status==="ลา") leave++;
-    if(d.status==="ขาด") absent++;
-
-    let hours = 0;
-
-    if(d.check_in && d.check_out){
-      const s = d.check_in.split(":");
-      const e = d.check_out.split(":");
-
-      const sm = s[0]*60 + +s[1];
-      const em = e[0]*60 + +e[1];
-
-      hours = (em-sm)/60;
-      total += hours;
-    }
-
-    if(table){
-      table.innerHTML += `
-        <tr>
-          <td>${d.date}</td>
-          <td>${d.check_in||"-"}</td>
-          <td>${d.check_out||"-"}</td>
-          <td>${hours.toFixed(1)}</td>
-          <td>${d.status}</td>
-          <td>${d.remarks||"-"}</td>
-        </tr>
-      `;
-    }
-  });
-
-  document.getElementById("workDays")?.innerText = "มาทำงาน: "+work+" วัน";
-  document.getElementById("lateDays")?.innerText = "สาย: "+late+" วัน";
-  document.getElementById("leaveDays")?.innerText = "ลา: "+leave+" วัน";
-  document.getElementById("absentDays")?.innerText = "ขาด: "+absent+" วัน";
-  document.getElementById("totalHours")?.innerText = "รวม: "+total.toFixed(1)+" ชม.";
 }
 
 
