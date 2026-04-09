@@ -166,7 +166,7 @@ button:hover{
 </div>
 
 <!-- 🔥 ปุ่ม -->
-<button type="button" onclick="register()">REGISTER</button>
+<button id="registerBtn" type="button">REGISTER</button>
 
 </form>
 
@@ -175,7 +175,10 @@ button:hover{
 </div>
 
 </div>
-
+  
+<script>
+document.getElementById("registerBtn").addEventListener("click", register);
+</script>
 <!-- 🔥 SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/app.js"></script>
