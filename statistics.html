@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>สถิติรายบุคคล</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Prompt',sans-serif;
+  min-height:100vh;
+  background: radial-gradient(circle at bottom,#0a0a0a,#000);
+  color:#f5d06f;
+  padding:20px;
+}
+
+/* ดาว */
+body::before{
+  content:"";
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url("https://www.transparenttextures.com/patterns/stardust.png");
+  animation:moveStars 80s linear infinite;
+  opacity:0.4;
+  z-index:-1;
+}
+@keyframes moveStars{
+  from{background-position:0 0;}
+  to{background-position:2000px 2000px;}
+}
+
+/* CARD */
+.card{
+  max-width:900px;
+  margin:auto;
+  background:rgba(15,15,15,0.85);
+  padding:30px;
+  border-radius:20px;
+  border:1px solid rgba(255,215,0,0.3);
+  box-shadow:0 0 40px rgba(255,215,0,0.2);
+}
+
+/* TITLE */
+h1{
+  text-align:center;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#ffd700,#ffcc00);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* STATS BOX */
+.stat{
+  background:rgba(255,215,0,0.1);
+  padding:12px;
+  border-radius:10px;
+  margin:10px 0;
+  text-align:center;
+  font-size:18px;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  margin-top:20px;
+  border-collapse:collapse;
+  background:rgba(15,15,15,0.8);
+}
+td,th{
+  border:1px solid rgba(255,215,0,0.3);
+  padding:10px;
+  text-align:center;
+}
+th{
+  background:rgba(255,215,0,0.1);
+}
+
+/* LINK */
+a{
+  color:#ffd700;
+  text-decoration:none;
+}
+a:hover{
+  text-shadow:0 0 10px gold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>สถิติรายบุคคล</h1>
+<h2 id="username">ชื่อ: GusTsu</h2>
+
+<!-- 📊 สถิติ -->
+<div class="stat" id="workDays">มาทำงาน: 0 วัน</div>
+<div class="stat" id="lateDays">มาสาย: 0 วัน</div>
+<div class="stat" id="leaveDays">ลา: 0 วัน</div>
+<div class="stat" id="absentDays">ขาด: 0 วัน</div>
+<div class="stat" id="totalHours">รวมชั่วโมงทำงาน: 0 ชม.</div>
+
+<!-- 📋 ตารางประวัติ -->
+<table>
+<thead>
+<tr>
+<th>วันที่</th>
+<th>เข้า</th>
+<th>ออก</th>
+<th>ชั่วโมง</th>
+<th>สถานะ</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+
+<tbody id="historyTable">
+<tr><td colspan="6">ยังไม่มีข้อมูล</td></tr>
+</tbody>
+</table>
+
+<br>
+<a href="dashboard.html">← กลับหน้า Dashboard</a>
+
+</div>
+
+<script>
+
+// 👤 mock data (เดี๋ยว Supabase ค่อยแทน)
+const data = [
+  {date:"2026-04-01", in:"08:00", out:"17:00", status:"ปกติ", note:""},
+  {date:"2026-04-02", in:"09:00", out:"17:00", status:"สาย", note:"รถติด"},
+  {date:"2026-04-03", in:"", out:"", status:"ลา", note:"ป่วย"},
+  {date:"2026-04-04", in:"", out:"", status:"ขาด", note:""},
+];
+
+// 📊 ตัวแปร
+let work=0, late=0, leave=0, absent=0, totalHours=0;
+
+// ⏱️ คำนวณเวลา
+function calcHours(start,end){
+  if(!start || !end) return 0;
+
+  const s = start.split(":");
+  const e = end.split(":");
+
+  const startMin = parseInt(s[0])*60 + parseInt(s[1]);
+  const endMin = parseInt(e[0])*60 + parseInt(e[1]);
+
+  return (endMin - startMin)/60;
+}
+
+// 📥 โหลดข้อมูล
+const table = document.getElementById("historyTable");
+table.innerHTML = "";
+
+data.forEach(d=>{
+
+  if(d.status==="ปกติ") work++;
+  if(d.status==="สาย") late++;
+  if(d.status==="ลา") leave++;
+  if(d.status==="ขาด") absent++;
+
+  const hours = calcHours(d.in,d.out);
+  totalHours += hours;
+
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td>${d.date}</td>
+    <td>${d.in || "-"}</td>
+    <td>${d.out || "-"}</td>
+    <td>${hours.toFixed(1)}</td>
+    <td>${d.status}</td>
+    <td>${d.note || "-"}</td>
+  `;
+
+  table.appendChild(tr);
+});
+
+// 📊 แสดงผล
+workDays.innerText = "มาทำงาน: " + work + " วัน";
+lateDays.innerText = "มาสาย: " + late + " วัน";
+leaveDays.innerText = "ลา: " + leave + " วัน";
+absentDays.innerText = "ขาด: " + absent + " วัน";
+totalHours.innerText = "รวมชั่วโมงทำงาน: " + totalHours.toFixed(1) + " ชม.";
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/stats.js"></script>
+
+</body>
+</html>

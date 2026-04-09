@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - TimeSyndicate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Prompt',sans-serif;
+  min-height:100vh;
+  background: radial-gradient(circle at bottom,#0a0a0a,#000);
+  color:#f5d06f;
+  padding:20px;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url("https://www.transparenttextures.com/patterns/stardust.png");
+  animation:moveStars 80s linear infinite;
+  opacity:0.4;
+  z-index:-1;
+}
+@keyframes moveStars{
+  from{background-position:0 0;}
+  to{background-position:2000px 2000px;}
+}
+
+.card{
+  max-width:1100px;
+  margin:auto;
+  background:rgba(15,15,15,0.85);
+  padding:30px;
+  border-radius:20px;
+  border:1px solid rgba(255,215,0,0.3);
+  box-shadow:0 0 40px rgba(255,215,0,0.2);
+}
+
+.logo{
+  width:160px;
+  margin:0 auto 10px;
+}
+.logo img{
+  width:100%;
+  filter: drop-shadow(0 0 10px gold);
+}
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+  font-size:28px;
+  background:linear-gradient(90deg,#ffd700,#ffcc00);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+label{display:block;margin-top:12px;color:#ffd700;}
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:12px;
+  border:1px solid rgba(255,215,0,0.3);
+  background:rgba(0,0,0,0.5);
+  color:#fff;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,#ffd700,#ffcc00);
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 20px gold;
+}
+
+.leave-buttons{
+  display:flex;
+  gap:10px;
+}
+.leave-btn{
+  flex:1;
+  background:#333;
+  color:white;
+}
+.leave-btn.active{
+  background:#ffd700;
+  color:black;
+}
+
+table{
+  width:100%;
+  margin-top:25px;
+  border-collapse:collapse;
+  background:rgba(15,15,15,0.8);
+}
+td,th{
+  border:1px solid rgba(255,215,0,0.3);
+  padding:10px;
+  text-align:center;
+}
+th{
+  background:rgba(255,215,0,0.1);
+}
+
+a{
+  color:#ffd700;
+  text-decoration:none;
+}
+a:hover{
+  text-shadow:0 0 10px gold;
+}
+
+.delete-btn{
+  background:red;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="logo">
+  <img src="assets/TS01.png">
+</div>
+
+<h1>ลงเวลางาน</h1>
+
+<form id="form">
+
+<label>วันที่</label>
+<input type="text" id="date_picker" required>
+
+<label>เวลาเข้า</label>
+<select id="check_in"></select>
+
+<label>เวลาออก</label>
+<select id="check_out"></select>
+
+<label>สถานะ</label>
+<div class="leave-buttons">
+  <button type="button" class="leave-btn active">ปกติ</button>
+  <button type="button" class="leave-btn">ลา</button>
+  <button type="button" class="leave-btn">สาย</button>
+</div>
+
+<label>หมายเหตุ</label>
+<input type="text" id="remarks">
+
+<button type="submit">บันทึก</button>
+
+</form>
+
+<table>
+<thead>
+<tr>
+<th>ชื่อ</th>
+<th>วันที่</th>
+<th>เข้า</th>
+<th>ออก</th>
+<th>สถานะ</th>
+<th>หมายเหตุ</th>
+<th>ลบ</th>
+</tr>
+</thead>
+
+<tbody id="tableBody">
+<tr><td colspan="7">ยังไม่มีข้อมูล</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<script>
+// 📅 date picker
+flatpickr("#date_picker",{dateFormat:"Y-m-d"});
+
+// ⏰ generate time
+function generateTime(){
+  let html = '<option value="">--เลือกเวลา--</option>';
+  for(let h=0;h<24;h++){
+    for(let m=0;m<60;m+=15){
+      let hh = String(h).padStart(2,"0");
+      let mm = String(m).padStart(2,"0");
+      html += `<option value="${hh}:${mm}">${hh}:${mm}</option>`;
+    }
+  }
+  document.getElementById("check_in").innerHTML = html;
+  document.getElementById("check_out").innerHTML = html;
+}
+generateTime();
+
+// 🟡 status button
+let currentStatus = "ปกติ";
+document.querySelectorAll(".leave-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll(".leave-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentStatus = btn.innerText;
+  };
+});
+
+// 👤 user demo
+const currentUser = "GusTsu";
+
+// 💾 submit
+const form = document.getElementById("form");
+const table = document.getElementById("tableBody");
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const date = document.getElementById("date_picker").value;
+  const cin = document.getElementById("check_in").value;
+  const cout = document.getElementById("check_out").value;
+  const note = document.getElementById("remarks").value;
+
+  if(!date){
+    alert("กรุณาเลือกวันที่");
+    return;
+  }
+
+  if(table.innerHTML.includes("ยังไม่มีข้อมูล")){
+    table.innerHTML = "";
+  }
+
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td><a href="statistics.html?user_id=1">${currentUser}</a></td>
+    <td>${date}</td>
+    <td>${cin || "-"}</td>
+    <td>${cout || "-"}</td>
+    <td>${currentStatus}</td>
+    <td>${note || "-"}</td>
+    <td><button type="button" class="delete-btn" onclick="deleteRow(this)">ลบ</button></td>
+  `;
+
+  table.prepend(tr);
+  form.reset();
+});
+
+// 🗑️ delete
+function deleteRow(btn){
+  if(confirm("ลบข้อมูลนี้ใช่ไหม?")){
+    btn.closest("tr").remove();
+  }
+}
+</script>
+
+<!-- ✅ CDN (ถูกต้อง) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
