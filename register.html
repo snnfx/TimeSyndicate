@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Register - TimeSyndicate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -28,7 +27,6 @@ body::before{
   opacity:0.4;
 }
 @keyframes moveStars{from{background-position:0 0;}to{background-position:2000px 2000px;}}
-
 .card{
   width:100%;
   max-width:420px;
@@ -40,12 +38,15 @@ body::before{
   box-shadow:0 0 40px rgba(255,215,0,0.2);
   text-align:center;
 }
-
 .logo{width:150px;margin:0 auto 10px;}
-.logo img{width:100%;filter: drop-shadow(0 0 10px gold);}
-
-h1{font-size:24px;margin-bottom:20px;background:linear-gradient(90deg,#ffd700,#ffcc00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
+.logo img{width:100%; filter: drop-shadow(0 0 10px gold);}
+h1{
+  font-size:24px;
+  margin-bottom:20px;
+  background:linear-gradient(90deg,#ffd700,#ffcc00);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 .input-group{margin-bottom:15px;text-align:left;}
 .input-group label{font-size:12px;color:#ffd700;}
 .input-group input{
@@ -57,7 +58,6 @@ h1{font-size:24px;margin-bottom:20px;background:linear-gradient(90deg,#ffd700,#f
   background:rgba(0,0,0,0.5);
   color:#fff;
 }
-
 button{
   width:100%;
   padding:13px;
@@ -72,42 +72,37 @@ button:hover{
   transform:scale(1.05);
   box-shadow:0 0 20px gold;
 }
-
 .link{margin-top:12px;font-size:13px;}
 .link a{color:#ffd700;text-decoration:none;}
-
-#msg{margin-bottom:10px;font-size:14px;}
+#msg{margin-bottom:10px;font-size:14px;color:red;}
 </style>
 </head>
 
 <body>
-
 <div class="card">
-<div class="logo"><img src="assets/TS01.png" alt="Logo"></div>
-<h1>REGISTER</h1>
-<div id="msg"></div>
+  <div class="logo"><img src="assets/TS01.png" alt="Logo"></div>
+  <h1>REGISTER</h1>
+  <div id="msg"></div>
 
-<form id="registerForm">
-<div class="input-group"><label>ชื่อ</label><input type="text" id="firstname" required></div>
-<div class="input-group"><label>นามสกุล</label><input type="text" id="lastname" required></div>
-<div class="input-group"><label>Username</label><input type="text" id="username" required></div>
-<div class="input-group"><label>เบอร์ (7 หลัก)</label><input type="text" id="phone" maxlength="7" required></div>
-<div class="input-group"><label>Password</label><input type="password" id="password" required></div>
-<div class="input-group"><label>Confirm Password</label><input type="password" id="confirm" required></div>
-<button type="submit">REGISTER</button>
-</form>
+  <form onsubmit="return false;">
+    <div class="input-group"><label>ชื่อ</label><input type="text" id="firstname" required></div>
+    <div class="input-group"><label>นามสกุล</label><input type="text" id="lastname" required></div>
+    <div class="input-group"><label>Username</label><input type="text" id="username" required></div>
+    <div class="input-group"><label>เบอร์ (7 หลัก)</label><input type="text" id="phone" maxlength="7" required></div>
+    <div class="input-group"><label>Password</label><input type="password" id="password" required></div>
+    <div class="input-group"><label>Confirm Password</label><input type="password" id="confirm" required></div>
+    <button id="registerBtn" type="button">REGISTER</button>
+  </form>
 
-<div class="link">มีบัญชีแล้ว? <a href="index.html">เข้าสู่ระบบ</a></div>
+  <div class="link">
+    มีบัญชีแล้ว? <a href="index.html">เข้าสู่ระบบ</a>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/app.js" defer></script>
-
 <script>
-document.getElementById("registerForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  register();
-});
+document.getElementById("registerBtn").addEventListener("click", register);
 </script>
 </body>
 </html>
