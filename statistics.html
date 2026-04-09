@@ -196,84 +196,8 @@ totalHours.innerText = "รวมชั่วโมงทำงาน: " + total
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="js/app.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/stats.js"></script>
 
-<script>
-(async () => {
-
-  // 🔐 เช็ค login
-  const user = await checkAuth();
-  if(!user) return;
-
-  // 📌 ดึง user_id จาก URL
-  const params = new URLSearchParams(window.location.search);
-  const user_id = params.get("user_id") || user.id;
-
-  // 👤 โหลดชื่อ
-  const { data: userData } = await supabaseClient
-    .from("users")
-    .select("username")
-    .eq("id", user_id)
-    .single();
-
-  if(userData){
-    document.getElementById("username").innerText = "ชื่อ: " + userData.username;
-  }
-
-  // 📥 โหลด attendance
-  const { data } = await supabaseClient
-    .from("attendance")
-    .select("*")
-    .eq("user_id", user_id)
-    .order("date", { ascending: false });
-
-  let work=0, late=0, leave=0, absent=0, total=0;
-
-  const table = document.getElementById("historyTable");
-  table.innerHTML = "";
-
-  data.forEach(d => {
-
-    if(d.status==="ปกติ") work++;
-    if(d.status==="สาย") late++;
-    if(d.status==="ลา") leave++;
-    if(d.status==="ขาด") absent++;
-
-    let hours = 0;
-
-    if(d.check_in && d.check_out){
-      const s = d.check_in.split(":");
-      const e = d.check_out.split(":");
-
-      const sm = s[0]*60 + +s[1];
-      const em = e[0]*60 + +e[1];
-
-      hours = (em - sm)/60;
-      total += hours;
-    }
-
-    table.innerHTML += `
-      <tr>
-        <td>${d.date}</td>
-        <td>${d.check_in || "-"}</td>
-        <td>${d.check_out || "-"}</td>
-        <td>${hours.toFixed(1)}</td>
-        <td>${d.status}</td>
-        <td>${d.remarks || "-"}</td>
-      </tr>
-    `;
-  });
-
-  // 📊 แสดงผล
-  document.getElementById("workDays").innerText = "มาทำงาน: "+work+" วัน";
-  document.getElementById("lateDays").innerText = "มาสาย: "+late+" วัน";
-  document.getElementById("leaveDays").innerText = "ลา: "+leave+" วัน";
-  document.getElementById("absentDays").innerText = "ขาด: "+absent+" วัน";
-  document.getElementById("totalHours").innerText = "รวมชั่วโมงทำงาน: "+total.toFixed(1)+" ชม.";
-
-})();
-</script>
-  
 </body>
 </html>
