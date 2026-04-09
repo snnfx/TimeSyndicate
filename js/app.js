@@ -1,10 +1,11 @@
 // ======================
-// 🔐 CONFIG (ของคุณ)
+// 🔐 CONFIG
 // ======================
 const supabaseUrl = "https://xcuqimawoztbjwmipqmz.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdXFpbWF3b3p0Ymp3bWlwcW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzQ1NjAsImV4cCI6MjA5MTI1MDU2MH0.A8yQNleDFZn7os44dKUocXBkyN11ESgVAcHn3lew2Z0";
+const supabaseKey = "YOUR_KEY";
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// 🔥 เปลี่ยนชื่อกันชนซ้ำ
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 
 // ======================
@@ -12,13 +13,18 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // ======================
 async function register(){
 
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirm").value;
-  const firstname = document.getElementById("firstname").value;
-  const lastname = document.getElementById("lastname").value;
-  const phone = document.getElementById("phone").value;
+  const username = document.getElementById("username")?.value.trim();
+  const password = document.getElementById("password")?.value;
+  const confirm = document.getElementById("confirm")?.value;
+  const firstname = document.getElementById("firstname")?.value;
+  const lastname = document.getElementById("lastname")?.value;
+  const phone = document.getElementById("phone")?.value;
   const msg = document.getElementById("msg");
+
+  if(!username || !password){
+    msg.innerHTML = "❌ กรุณากรอกข้อมูล";
+    return;
+  }
 
   if(password !== confirm){
     msg.innerHTML = "❌ รหัสผ่านไม่ตรงกัน";
@@ -26,7 +32,7 @@ async function register(){
   }
 
   // 🔍 เช็ค username ซ้ำ
-  const { data: exist } = await supabase
+  const { data: exist } = await supabaseClient
     .from("users")
     .select("username")
     .eq("username", username)
@@ -39,7 +45,7 @@ async function register(){
 
   const fakeEmail = username + "@ts.com";
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await supabaseClient.auth.signUp({
     email: fakeEmail,
     password: password
   });
@@ -50,7 +56,7 @@ async function register(){
   }
 
   // 💾 บันทึก user
-  await supabase.from("users").insert([{
+  await supabaseClient.from("users").insert([{
     id: data.user.id,
     username,
     firstname,
@@ -67,12 +73,17 @@ async function register(){
 // ======================
 async function login(){
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const username = document.getElementById("username")?.value;
+  const password = document.getElementById("password")?.value;
+
+  if(!username || !password){
+    alert("กรุณากรอกข้อมูล");
+    return;
+  }
 
   const fakeEmail = username + "@ts.com";
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabaseClient.auth.signInWithPassword({
     email: fakeEmail,
     password: password
   });
@@ -91,7 +102,7 @@ async function login(){
 // ======================
 async function checkAuth(){
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
   if(!user){
     window.location.href = "index.html";
@@ -107,14 +118,15 @@ async function checkAuth(){
 // ======================
 async function loadProfile(user){
 
-  const { data } = await supabase
+  const { data } = await supabaseClient
     .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if(document.getElementById("usernameShow")){
-    document.getElementById("usernameShow").innerText = data.username;
+  const el = document.getElementById("usernameShow");
+  if(el){
+    el.innerText = data.username;
   }
 
   return data;
@@ -136,9 +148,12 @@ function generateTime(){
     }
   }
 
-  if(document.getElementById("check_in")){
-    check_in.innerHTML = html;
-    check_out.innerHTML = html;
+  const checkInEl = document.getElementById("check_in");
+  const checkOutEl = document.getElementById("check_out");
+
+  if(checkInEl && checkOutEl){
+    checkInEl.innerHTML = html;
+    checkOutEl.innerHTML = html;
   }
 }
 
@@ -148,10 +163,10 @@ function generateTime(){
 // ======================
 async function saveAttendance(user){
 
-  const date = date_picker.value;
-  const cin = check_in.value;
-  const cout = check_out.value;
-  const note = remarks.value;
+  const date = document.getElementById("date_picker")?.value;
+  const cin = document.getElementById("check_in")?.value;
+  const cout = document.getElementById("check_out")?.value;
+  const note = document.getElementById("remarks")?.value;
 
   let status = document.querySelector(".leave-btn.active")?.innerText || "ปกติ";
 
@@ -160,7 +175,7 @@ async function saveAttendance(user){
     return;
   }
 
-  await supabase.from("attendance").insert([{
+  await supabaseClient.from("attendance").insert([{
     user_id: user.id,
     date: date,
     check_in: cin,
@@ -174,11 +189,11 @@ async function saveAttendance(user){
 
 
 // ======================
-// 📋 LOAD ATTENDANCE (ทุกคนเห็น)
+// 📋 LOAD ATTENDANCE
 // ======================
 async function loadAttendance(user){
 
-  const { data } = await supabase
+  const { data } = await supabaseClient
     .from("attendance")
     .select(`
       *,
@@ -227,7 +242,7 @@ async function deleteRow(id){
 
   if(!confirm("ลบข้อมูลนี้ใช่ไหม?")) return;
 
-  await supabase
+  await supabaseClient
     .from("attendance")
     .delete()
     .eq("id", id);
@@ -244,7 +259,7 @@ async function loadStats(){
   const params = new URLSearchParams(window.location.search);
   const user_id = params.get("user_id");
 
-  const { data } = await supabase
+  const { data } = await supabaseClient
     .from("attendance")
     .select("*")
     .eq("user_id", user_id);
@@ -288,11 +303,11 @@ async function loadStats(){
     }
   });
 
-  if(workDays) workDays.innerText = "มาทำงาน: "+work+" วัน";
-  if(lateDays) lateDays.innerText = "สาย: "+late+" วัน";
-  if(leaveDays) leaveDays.innerText = "ลา: "+leave+" วัน";
-  if(absentDays) absentDays.innerText = "ขาด: "+absent+" วัน";
-  if(totalHours) totalHours.innerText = "รวม: "+total.toFixed(1)+" ชม.";
+  document.getElementById("workDays")?.innerText = "มาทำงาน: "+work+" วัน";
+  document.getElementById("lateDays")?.innerText = "สาย: "+late+" วัน";
+  document.getElementById("leaveDays")?.innerText = "ลา: "+leave+" วัน";
+  document.getElementById("absentDays")?.innerText = "ขาด: "+absent+" วัน";
+  document.getElementById("totalHours")?.innerText = "รวม: "+total.toFixed(1)+" ชม.";
 }
 
 
@@ -300,6 +315,6 @@ async function loadStats(){
 // 🚪 LOGOUT
 // ======================
 async function logout(){
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   window.location.href = "index.html";
 }
