@@ -155,11 +155,14 @@ button:hover{
 
 </div>
 
-<!-- ✅ CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/app.js" defer></script>
 
-<!-- ✅ JS -->
-<script src="js/login.js"></script>
-
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  login();
+});
+</script>
 </body>
 </html>
