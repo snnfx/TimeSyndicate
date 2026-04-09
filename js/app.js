@@ -2,7 +2,7 @@
 // 🔐 CONFIG
 // ======================
 const supabaseUrl = "https://xcuqimawoztbjwmipqmz.supabase.co";
-const supabaseKey = "YOUR_SUPABASE_ANON_KEY"; // เปลี่ยนเป็น ANON KEY ของคุณ
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdXFpbWF3b3p0Ymp3bWlwcW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzQ1NjAsImV4cCI6MjA5MTI1MDU2MH0.A8yQNleDFZn7os44dKUocXBkyN11ESgVAcHn3lew2Z0"; // เปลี่ยนเป็น ANON KEY ของคุณ
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 
