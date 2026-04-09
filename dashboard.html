@@ -267,26 +267,11 @@ function deleteRow(btn){
     btn.closest("tr").remove();
   }
 }
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="js/app.js" defer></script>
-
-<script>
-flatpickr("#date_picker",{dateFormat:"Y-m-d"});
-
-(async () => {
-  const user = await checkAuth();
-  if(!user) return;
-
-  generateTime();
-  loadProfile(user);
-  loadAttendance(user);
-
-  document.getElementById("form").addEventListener("submit", function(e){
-    e.preventDefault();
-    saveAttendance(user);
-  });
-})();
 </script>
+
+<!-- ✅ CDN (ถูกต้อง) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
