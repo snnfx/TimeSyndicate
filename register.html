@@ -9,7 +9,6 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-
 body{
   font-family:'Prompt',sans-serif;
   height:100vh;
@@ -19,8 +18,6 @@ body{
   background: radial-gradient(circle at bottom,#0a0a0a,#000);
   color:#f5d06f;
 }
-
-/* ดาว */
 body::before{
   content:"";
   position:fixed;
@@ -30,12 +27,8 @@ body::before{
   animation:moveStars 80s linear infinite;
   opacity:0.4;
 }
-@keyframes moveStars{
-  from{background-position:0 0;}
-  to{background-position:2000px 2000px;}
-}
+@keyframes moveStars{from{background-position:0 0;}to{background-position:2000px 2000px;}}
 
-/* CARD */
 .card{
   width:100%;
   max-width:420px;
@@ -48,34 +41,13 @@ body::before{
   text-align:center;
 }
 
-/* LOGO */
-.logo{
-  width:150px;
-  margin:0 auto 10px;
-}
-.logo img{
-  width:100%;
-  filter: drop-shadow(0 0 10px gold);
-}
+.logo{width:150px;margin:0 auto 10px;}
+.logo img{width:100%;filter: drop-shadow(0 0 10px gold);}
 
-/* TITLE */
-h1{
-  font-size:24px;
-  margin-bottom:20px;
-  background:linear-gradient(90deg,#ffd700,#ffcc00);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
+h1{font-size:24px;margin-bottom:20px;background:linear-gradient(90deg,#ffd700,#ffcc00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 
-/* INPUT */
-.input-group{
-  margin-bottom:15px;
-  text-align:left;
-}
-.input-group label{
-  font-size:12px;
-  color:#ffd700;
-}
+.input-group{margin-bottom:15px;text-align:left;}
+.input-group label{font-size:12px;color:#ffd700;}
 .input-group input{
   width:100%;
   margin-top:5px;
@@ -86,7 +58,6 @@ h1{
   color:#fff;
 }
 
-/* BUTTON */
 button{
   width:100%;
   padding:13px;
@@ -102,89 +73,39 @@ button:hover{
   box-shadow:0 0 20px gold;
 }
 
-/* LINK */
-.link{
-  margin-top:12px;
-  font-size:13px;
-}
-.link a{
-  color:#ffd700;
-  text-decoration:none;
-}
+.link{margin-top:12px;font-size:13px;}
+.link a{color:#ffd700;text-decoration:none;}
 
-/* MSG */
-#msg{
-  margin-bottom:10px;
-  font-size:14px;
-}
+#msg{margin-bottom:10px;font-size:14px;}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-
-<div class="logo">
-  <img src="assets/TS01.png" alt="Logo">
-</div>
-
+<div class="logo"><img src="assets/TS01.png" alt="Logo"></div>
 <h1>REGISTER</h1>
-
 <div id="msg"></div>
 
-<!-- 🔥 FORM -->
-<form onsubmit="return false;">
-
-<div class="input-group">
-  <label>ชื่อ</label>
-  <input type="text" id="firstname" required>
-</div>
-
-<div class="input-group">
-  <label>นามสกุล</label>
-  <input type="text" id="lastname" required>
-</div>
-
-<div class="input-group">
-  <label>Username</label>
-  <input type="text" id="username" required>
-</div>
-
-<div class="input-group">
-  <label>เบอร์ (7 หลัก)</label>
-  <input type="text" id="phone" maxlength="7" required>
-</div>
-
-<div class="input-group">
-  <label>Password</label>
-  <input type="password" id="password" required>
-</div>
-
-<div class="input-group">
-  <label>Confirm Password</label>
-  <input type="password" id="confirm" required>
-</div>
-
-<!-- 🔥 ปุ่ม -->
-<button id="registerBtn" type="button">REGISTER</button>
-
+<form id="registerForm">
+<div class="input-group"><label>ชื่อ</label><input type="text" id="firstname" required></div>
+<div class="input-group"><label>นามสกุล</label><input type="text" id="lastname" required></div>
+<div class="input-group"><label>Username</label><input type="text" id="username" required></div>
+<div class="input-group"><label>เบอร์ (7 หลัก)</label><input type="text" id="phone" maxlength="7" required></div>
+<div class="input-group"><label>Password</label><input type="password" id="password" required></div>
+<div class="input-group"><label>Confirm Password</label><input type="password" id="confirm" required></div>
+<button type="submit">REGISTER</button>
 </form>
 
-<div class="link">
-  มีบัญชีแล้ว? <a href="index.html">เข้าสู่ระบบ</a>
+<div class="link">มีบัญชีแล้ว? <a href="index.html">เข้าสู่ระบบ</a></div>
 </div>
 
-</div>
-  
-<script>
-document.getElementById("registerBtn").addEventListener("click", register);
-</script>
-<!-- 🔥 SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="js/app.js"></script>
+<script src="js/app.js" defer></script>
 
 <script>
-document.getElementById("registerBtn").addEventListener("click", function(){
+document.getElementById("registerForm").addEventListener("submit", function(e){
+  e.preventDefault();
   register();
 });
 </script>
